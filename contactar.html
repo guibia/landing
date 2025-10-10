@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactar - Bia Energy</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism styling */
+        .glassmorphism {
+            backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        /* Logo scroll animation - exactly like mobile version */
+        .logo-container {
+            overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+        }
+        
+        .logo-scroll {
+            display: flex;
+            animation: scrollLogos 46s linear infinite;
+            width: fit-content;
+            gap: 3rem;
+        }
+        
+        .logo-item {
+            flex-shrink: 0;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-item img {
+            height: 2rem;
+            width: auto;
+            filter: brightness(0) saturate(100%) invert(88%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(105%) contrast(95%);
+            opacity: 0.6;
+        }
+        
+        /* Stacked review cards */
+        .reviews-stack {
+            position: relative;
+            height: 200px;
+            margin: 3rem 0;
+        }
+        
+        .review-card {
+            position: absolute;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .review-card.card-0 {
+            top: 0;
+            z-index: 30;
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        
+        .review-card.card-1 {
+            top: 8px;
+            z-index: 20;
+            transform: translateY(0) scale(0.98);
+            opacity: 0.7;
+        }
+        
+        .review-card.card-2 {
+            top: 16px;
+            z-index: 10;
+            transform: translateY(0) scale(0.96);
+            opacity: 0.4;
+        }
+        
+        .review-card.exiting {
+            transform: translateY(-20px) scale(0.95);
+            opacity: 0;
+        }
+        
+        .company-subtitle {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+        
+        @keyframes scrollLogos {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+        
+        /* Sticky logo at top */
+        .sticky-logo {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1000;
+        }
+        
+        /* Gradient button for CTA */
+        .premium-gradient-button {
+            background: linear-gradient(135deg, #08ddbc 0%, #17ffdb 100%);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .premium-gradient-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(8, 221, 188, 0.3);
+        }
+        
+        /* Submit button - exact same styling as header CTA button */
+        .submit-button {
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 20%, #e9ecef 80%, #dee2e6 100%);
+            border: 1px solid #e8e8e8;
+            color: #333333;
+            box-shadow: 0 0 0 5px #1a1a1a;
+            transition: box-shadow 0.4s ease-in-out, background 0.5s ease, border 0.5s ease, color 0.5s ease;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 6px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            min-height: 48px;
+            position: relative;
+        }
+        
+        .submit-button:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #fdfdfe 20%, #f1f3f4 80%, #e9ecef 100%);
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 0 0 5px #404040;
+        }
+        
+        .submit-button:active {
+            background: linear-gradient(180deg, #f1f3f4 0%, #e9ecef 20%, #dee2e6 80%, #ced4da 100%);
+            border: 1px solid #d8d8d8;
+            box-shadow: 0 0 0 5px #1a1a1a;
+            transform: none;
+        }
+        
+        .submit-button:focus {
+            outline: none;
+        }
+        
+        /* Error state for labels */
+        .label-error {
+            color: #ef4444 !important;
+            animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+            transition: color 0.5s ease;
+        }
+        
+        @keyframes shake {
+            10%, 90% {
+                transform: translateX(-2px);
+            }
+            20%, 80% {
+                transform: translateX(4px);
+            }
+            30%, 50%, 70% {
+                transform: translateX(-6px);
+            }
+            40%, 60% {
+                transform: translateX(6px);
+            }
+        }
+        
+        /* Selected option styling */
+        #energia-mes.has-value {
+            color: white !important;
+        }
+        
+        /* Spinning loader */
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid #333333;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Success button state */
+        .submit-button.success {
+            background: linear-gradient(135deg, #08ddbc 0%, #17ffdb 100%) !important;
+            border: 1px solid #08ddbc !important;
+            color: white !important;
+            box-shadow: 0 0 0 5px #1a1a1a, 0 8px 20px rgba(8, 221, 188, 0.3) !important;
+        }
+        
+        /* Fade animations */
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Success message container */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            transition: opacity 0.6s ease;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .success-checkmark {
+            width: 100px;
+            height: auto;
+            margin: 0 auto 1.5rem;
+            object-fit: contain;
+        }
+        
+        /* Container transition animation */
+        .form-container {
+            transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Sticky Logo at Top Left -->
+    <div class="sticky-logo">
+        <a href="index.html" class="inline-block hover:opacity-80 transition-opacity">
+            <img src="assets/logos/bia-logo.png" alt="Bia" class="h-6 w-auto">
+        </a>
+    </div>
+    
+    <!-- Full Page Container with Background -->
+    <div class="min-h-screen relative overflow-hidden">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0" style="background-image: url('assets/images/backgrounds/background-mid.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+        
+        <!-- Dark overlay -->
+        <div class="absolute inset-0 z-0 bg-black/60"></div>
+        
+        <!-- Content Grid -->
+        <div class="relative z-10 min-h-screen flex flex-col lg:grid lg:grid-cols-2 gap-8 p-4 sm:p-6 lg:p-12">
+            
+            <!-- Left Side - Branding (hidden on mobile/tablet, visible on desktop) -->
+            <div class="hidden lg:flex flex-col justify-start pt-24 lg:pt-32 space-y-8 lg:space-y-12 lg:pr-8">
+                
+                <!-- Title and Description -->
+                <div class="space-y-4 max-w-md">
+                    <h1 class="text-2xl lg:text-3xl font-bold text-white leading-tight">
+                        Recibe una oferta comercial a la medida para tu empresa
+                    </h1>
+                    <p class="text-base text-gray-300 leading-relaxed">
+                        Más de 3.500 empresas cambiaron a Bia como su nuevo comercializador de energía
+                    </p>
+                </div>
+                
+                <!-- Stacked Review Cards -->
+                <div class="reviews-stack max-w-md">
+                    <div class="review-card card-0" id="review-0">
+                        <p class="text-gray-200 text-sm leading-relaxed mb-4" id="review-text-0"></p>
+                        <div class="text-sm">
+                            <div class="text-white font-medium" id="review-name-0"></div>
+                            <div class="text-gray-400 text-xs mt-1" id="review-company-0"></div>
+                        </div>
+                    </div>
+                    <div class="review-card card-1" id="review-1">
+                        <p class="text-gray-200 text-sm leading-relaxed mb-4" id="review-text-1"></p>
+                        <div class="text-sm">
+                            <div class="text-white font-medium" id="review-name-1"></div>
+                            <div class="text-gray-400 text-xs mt-1" id="review-company-1"></div>
+                        </div>
+                    </div>
+                    <div class="review-card card-2" id="review-2">
+                        <p class="text-gray-200 text-sm leading-relaxed mb-4" id="review-text-2"></p>
+                        <div class="text-sm">
+                            <div class="text-white font-medium" id="review-name-2"></div>
+                            <div class="text-gray-400 text-xs mt-1" id="review-company-2"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Companies Title and Animated Logos -->
+                <div class="max-w-md">
+                    <p class="company-subtitle">Empresas líderes que ya confían en nosotros</p>
+                    
+                <!-- Animated Logos -->
+                <div class="logo-container">
+                    <div class="logo-scroll">
+                        <!-- Set 1 -->
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                        
+                        <!-- Set 2 (duplicate for seamless loop) -->
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                        
+                        <!-- Set 3 -->
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                        
+                        <!-- Set 4 -->
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                        
+                        <!-- Set 5 -->
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                        <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                        <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <!-- End Left Side -->
+            
+            <!-- Right Side - Contact Form (full width on mobile/tablet, right on desktop) -->
+            <div class="flex flex-col items-center justify-center flex-1 lg:flex-none space-y-6 lg:space-y-0">
+                
+                <!-- Mobile/Tablet Only Title (visible only on mobile/tablet) -->
+                <div class="lg:hidden w-full max-w-md text-center px-4 pt-20">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white leading-tight">
+                        Recibe una oferta comercial a la medida para tu empresa
+                    </h1>
+                </div>
+                
+                <div id="form-container" class="w-full max-w-md glassmorphism rounded-xl sm:rounded-2xl p-5 sm:p-8 lg:p-12 form-container">
+                    <form id="contact-form" class="space-y-4 sm:space-y-6" novalidate>
+                        <!-- Nombre completo -->
+                        <div class="flex flex-col gap-1">
+                            <label id="label-nombre-completo" class="text-[#a1a3b9] text-[14px] font-normal leading-[20px]">Nombre completo *</label>
+                            <div class="bg-[#080d12] border border-[#1d1e28] rounded-xl px-3 py-2.5 h-[42px] flex items-center w-full focus-within:border-[#6d7193] focus-within:shadow-[0px_0px_0px_2px_rgba(182,185,211,0.2)] transition-all duration-200">
+                                <input type="text" id="nombre-completo" placeholder="Carlos Rodriguez" class="w-full bg-transparent text-white placeholder-[#4a4d5a] text-[14px] font-normal leading-[20px] focus:outline-none focus:placeholder-[#a1a3b9]" autofocus required>
+                            </div>
+                        </div>
+                        
+                        <!-- Nombre de empresa -->
+                        <div class="flex flex-col gap-1">
+                            <label id="label-nombre-empresa" class="text-[#a1a3b9] text-[14px] font-normal leading-[20px]">Nombre de empresa *</label>
+                            <div class="bg-[#080d12] border border-[#1d1e28] rounded-xl px-3 py-2.5 h-[42px] flex items-center w-full focus-within:border-[#6d7193] focus-within:shadow-[0px_0px_0px_2px_rgba(182,185,211,0.2)] transition-all duration-200">
+                                <input type="text" id="nombre-empresa" placeholder="Mi Empresa S.A.S." class="w-full bg-transparent text-white placeholder-[#4a4d5a] text-[14px] font-normal leading-[20px] focus:outline-none focus:placeholder-[#a1a3b9]" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Email de trabajo -->
+                        <div class="flex flex-col gap-1">
+                            <label id="label-email-trabajo" class="text-[#a1a3b9] text-[14px] font-normal leading-[20px]">Email de trabajo *</label>
+                            <div class="bg-[#080d12] border border-[#1d1e28] rounded-xl px-3 py-2.5 h-[42px] flex items-center w-full focus-within:border-[#6d7193] focus-within:shadow-[0px_0px_0px_2px_rgba(182,185,211,0.2)] transition-all duration-200">
+                                <input type="email" id="email-trabajo" placeholder="carlos@empresa.com" class="w-full bg-transparent text-white placeholder-[#4a4d5a] text-[14px] font-normal leading-[20px] focus:outline-none focus:placeholder-[#a1a3b9]" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Celular -->
+                        <div class="flex flex-col gap-1">
+                            <label id="label-celular" class="text-[#a1a3b9] text-[14px] font-normal leading-[20px]">Celular *</label>
+                            <div class="bg-[#080d12] border border-[#1d1e28] rounded-xl px-3 py-2.5 h-[42px] flex items-center w-full focus-within:border-[#6d7193] focus-within:shadow-[0px_0px_0px_2px_rgba(182,185,211,0.2)] transition-all duration-200">
+                                <span class="text-[#a1a3b9] text-[14px] mr-2">+57</span>
+                                <input type="tel" id="celular" placeholder="300 123 4567" class="w-full bg-transparent text-white placeholder-[#4a4d5a] text-[14px] font-normal leading-[20px] focus:outline-none focus:placeholder-[#a1a3b9]" maxlength="12" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Energía al mes -->
+                        <div class="flex flex-col gap-1">
+                            <label id="label-energia-mes" class="text-[#a1a3b9] text-[14px] font-normal leading-[20px]">¿Cuánto paga tu empresa en energía al mes? *</label>
+                            <div class="bg-[#080d12] border border-[#1d1e28] rounded-xl px-3 py-2.5 h-[42px] flex items-center w-full focus-within:border-[#6d7193] focus-within:shadow-[0px_0px_0px_2px_rgba(182,185,211,0.2)] transition-all duration-200">
+                                <select id="energia-mes" class="w-full bg-transparent text-[#4a4d5a] text-[14px] font-normal leading-[20px] focus:outline-none appearance-none cursor-pointer" required>
+                                    <option value="" class="bg-[#080d12] text-[#4d4d5a]">Seleccionar</option>
+                                    <option value="5-15" class="bg-[#080d12] text-white">$5-$15 millones</option>
+                                    <option value="15-50" class="bg-[#080d12] text-white">$15-$50 millones</option>
+                                    <option value="50-100" class="bg-[#080d12] text-white">$50-$100 millones</option>
+                                    <option value="100+" class="bg-[#080d12] text-white">$100+ millones</option>
+                                </select>
+                                <!-- Dropdown arrow -->
+                                <svg class="w-4 h-4 text-[#4a4d5a] ml-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" id="submit-button" class="submit-button w-full rounded-[12px] px-6 py-3 font-medium">
+                            Enviar solicitud
+                        </button>
+                        
+                        <!-- Terms and conditions disclaimer -->
+                        <p class="text-center text-xs text-gray-500 mt-4">
+                            Al enviar la solicitud, aceptas nuestros términos y condiciones
+                        </p>
+                    </form>
+                    
+                    <!-- Success Message (hidden by default) -->
+                    <div id="success-message" class="success-message">
+                        <img src="assets/images/checkmark.png" alt="Success" class="success-checkmark">
+                        <h2 id="success-title" class="text-2xl font-bold text-white mb-2"></h2>
+                        <p id="success-description" class="text-gray-400 text-sm"></p>
+                    </div>
+                </div>
+                
+                <!-- Mobile/Tablet Only Logo Carousel (visible only on mobile/tablet) -->
+                <div class="lg:hidden w-full max-w-md px-4 pb-12">
+                    <p class="text-sm text-gray-400 text-center mb-4 tracking-wide">Empresas líderes que ya confían en nosotros</p>
+                    
+                    <!-- Animated Logos -->
+                    <div class="logo-container">
+                        <div class="logo-scroll">
+                            <!-- Set 1 -->
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                            
+                            <!-- Set 2 -->
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                            
+                            <!-- Set 3 -->
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                            
+                            <!-- Set 4 -->
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                            
+                            <!-- Set 5 -->
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517b8_Rappi.png" alt="Rappi"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Falabella.svg.png" alt="Falabella"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bf_Click Clack.png" alt="Click Clack"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Farmatodo_logo.svg.png" alt="Farmatodo"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Grupo_Nutresa-Logo.wine.png" alt="Nutresa"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Terpel.png" alt="Terpel"></div>
+                            <div class="logo-item"><img src="assets/logos/header/6602338a31da6ef3751517bd_PlasticosMonaco.png" alt="Plasticos Monaco"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group.png" alt="Sunshine Bouquet"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-1.png" alt="WeWork"></div>
+                            <div class="logo-item"><img src="assets/logos/header/Clip path group-2.png" alt="Domino's"></div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <!-- End Left Side -->
+            
+        </div>
+    </div>
+    
+    <script>
+        // Disable autofocus on mobile devices
+        document.addEventListener('DOMContentLoaded', function() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                            window.innerWidth < 1024 || 
+                            ('ontouchstart' in window);
+            
+            const nombreInput = document.getElementById('nombre-completo');
+            if (nombreInput && isMobile) {
+                nombreInput.removeAttribute('autofocus');
+                nombreInput.blur();
+                // Also prevent focus on click if it was accidentally focused
+                setTimeout(() => {
+                    if (document.activeElement === nombreInput) {
+                        nombreInput.blur();
+                    }
+                }, 100);
+            }
+        });
+        
+        // All testimonial data
+        const allTestimonials = [
+            {
+                text: "Bia ha transformado nuestra gestión energética. Los ahorros son reales y medibles.",
+                name: "Carlos Madrid",
+                company: "Home Burgers"
+            },
+            {
+                text: "Ahora vamos a un lugar donde antes teníamos miedo de ir hacia la innovación.",
+                name: "Felix Barcelona", 
+                company: "Color Plastic"
+            },
+            {
+                text: "Bia nos ha permitido estar presentes con nuestros datos energéticos sin quedar atascados en procesos manuales.",
+                name: "Ana Valencia",
+                company: "Dos del Alma"
+            },
+            {
+                text: "La guía de Bia me ha ayudado a entender la gestión energética empresarial.",
+                name: "Luis Sevilla",
+                company: "La Bugueña"
+            },
+            {
+                text: "Bia nos permite funcionar con mayor control sobre nuestros recursos energéticos.",
+                name: "María Bilbao",
+                company: "Casa Ronald McDonald"
+            },
+            {
+                text: "La implementación de Bia ha sido un cambio radical en nuestra eficiencia.",
+                name: "Roberto Zaragoza",
+                company: "Keep Go"
+            },
+            {
+                text: "Los reportes automáticos de Bia nos han dado visibilidad total de nuestro consumo.",
+                name: "Carmen Málaga",
+                company: "Click Clack"
+            },
+            {
+                text: "Con Bia hemos reducido nuestros costos operativos de forma significativa.",
+                name: "Diego Vigo",
+                company: "Fayco"
+            },
+            {
+                text: "El medidor inteligente de Bia nos dio visibilidad inmediata de nuestro consumo.",
+                name: "Elena Santander",
+                company: "Plásticos Mónaco"
+            },
+            {
+                text: "Bia ha revolucionado cómo entendemos y gestionamos la energía en nuestra empresa.",
+                name: "Javier Palma",
+                company: "Todos Comemos"
+            }
+        ];
+        
+        // Select 10 random testimonials and store them
+        let testimonials = [];
+        let currentIndex = 0;
+        
+        // Shuffle and select 10 random testimonials (only those with less than 95 characters)
+        function selectRandomTestimonials() {
+            // Filter testimonials with text less than 95 characters
+            const filtered = allTestimonials.filter(t => t.text.length < 95);
+            // Shuffle filtered testimonials
+            const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+            testimonials = shuffled.slice(0, 10);
+        }
+        
+        // Initialize reviews
+        function initReviews() {
+            selectRandomTestimonials();
+            for (let i = 0; i < 3; i++) {
+                const index = i % testimonials.length;
+                updateReviewCard(i, testimonials[index]);
+            }
+        }
+        
+        // Update a review card with data
+        function updateReviewCard(cardIndex, data) {
+            document.getElementById(`review-text-${cardIndex}`).textContent = data.text;
+            document.getElementById(`review-name-${cardIndex}`).textContent = data.name;
+            document.getElementById(`review-company-${cardIndex}`).textContent = data.company;
+        }
+        
+        // Rotate reviews with smooth animation
+        function rotateReviews() {
+            // Get the container and all cards in current DOM order
+            const container = document.querySelector('.reviews-stack');
+            const cards = Array.from(container.children);
+            
+            if (cards.length !== 3) return;
+            
+            // The first card in DOM is always the top visible one
+            const topCard = cards[0];
+            const middleCard = cards[1];
+            const bottomCard = cards[2];
+            
+            // Add exiting animation to top card
+            topCard.classList.add('exiting');
+            
+            setTimeout(() => {
+                // Move to next review index
+                currentIndex = (currentIndex + 1) % testimonials.length;
+                
+                // Update classes for new positions
+                topCard.classList.remove('card-0', 'card-1', 'card-2', 'exiting');
+                topCard.classList.add('card-2');
+                
+                middleCard.classList.remove('card-0', 'card-1', 'card-2');
+                middleCard.classList.add('card-0');
+                
+                bottomCard.classList.remove('card-0', 'card-1', 'card-2');
+                bottomCard.classList.add('card-1');
+                
+                // Update content of the card that moved to the back with next review
+                const nextReviewIndex = (currentIndex + 2) % testimonials.length;
+                const cardId = topCard.id.split('-')[1]; // Extract number from id
+                updateReviewCard(cardId, testimonials[nextReviewIndex]);
+                
+                // Move top card to the end of the DOM (becomes the back card visually)
+                container.appendChild(topCard);
+                
+            }, 300);
+        }
+        
+        // Initialize on page load
+        initReviews();
+        
+        // Auto-rotate every 8 seconds
+        setInterval(rotateReviews, 8000);
+        
+        // Phone number formatting
+        const celularInput = document.getElementById('celular');
+        celularInput.addEventListener('input', function(e) {
+            // Remove all non-digit characters
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Limit to 10 digits
+            value = value.substring(0, 10);
+            
+            // Format as XXX XXX XXXX
+            let formatted = '';
+            if (value.length > 0) {
+                formatted = value.substring(0, 3);
+            }
+            if (value.length >= 4) {
+                formatted += ' ' + value.substring(3, 6);
+            }
+            if (value.length >= 7) {
+                formatted += ' ' + value.substring(6, 10);
+            }
+            
+            e.target.value = formatted;
+        });
+        
+        // Dropdown selection - turn text white when option selected
+        const energiaMesSelect = document.getElementById('energia-mes');
+        energiaMesSelect.addEventListener('change', function() {
+            if (this.value) {
+                this.classList.add('has-value');
+            } else {
+                this.classList.remove('has-value');
+            }
+        });
+        
+        // Form validation and submission handler
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get all fields
+            const fields = [
+                { id: 'nombre-completo', labelId: 'label-nombre-completo' },
+                { id: 'nombre-empresa', labelId: 'label-nombre-empresa' },
+                { id: 'email-trabajo', labelId: 'label-email-trabajo' },
+                { id: 'celular', labelId: 'label-celular' },
+                { id: 'energia-mes', labelId: 'label-energia-mes' }
+            ];
+            
+            let hasErrors = false;
+            
+            // Validate each field
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                const label = document.getElementById(field.labelId);
+                
+                if (!input.value || input.value.trim() === '') {
+                    // Add error styling
+                    label.classList.add('label-error');
+                    hasErrors = true;
+                    
+                    // Automatically fade back to normal color after 2 seconds
+                    setTimeout(() => {
+                        label.classList.remove('label-error');
+                    }, 2000);
+                    
+                    // Also remove error when user focuses on the field
+                    input.addEventListener('focus', function() {
+                        label.classList.remove('label-error');
+                    }, { once: true });
+                }
+            });
+            
+            // If there are errors, don't submit
+            if (hasErrors) {
+                return;
+            }
+            
+            // Validate phone number has 10 digits
+            const celularValue = celularInput.value.replace(/\D/g, '');
+            if (celularValue.length !== 10) {
+                const celularLabel = document.getElementById('label-celular');
+                celularLabel.classList.add('label-error');
+                
+                // Automatically fade back to normal color after 2 seconds
+                setTimeout(() => {
+                    celularLabel.classList.remove('label-error');
+                }, 2000);
+                
+                celularInput.addEventListener('focus', function() {
+                    celularLabel.classList.remove('label-error');
+                }, { once: true });
+                return;
+            }
+            
+            // All validations passed - start animation sequence
+            const button = document.getElementById('submit-button');
+            const nombreCompleto = document.getElementById('nombre-completo').value;
+            const emailTrabajo = document.getElementById('email-trabajo').value;
+            const firstName = nombreCompleto.split(' ')[0]; // Get first word
+            
+            button.disabled = true;
+            
+            // Step 1: Fade out text and show spinner (2 seconds)
+            button.innerHTML = '<div class="spinner"></div>';
+            
+            setTimeout(() => {
+                // Step 2: Change to green with checkmark
+                button.classList.add('success');
+                button.innerHTML = '<svg class="inline-block w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>';
+                
+                // Fire confetti from button position
+                const rect = button.getBoundingClientRect();
+                const x = (rect.left + rect.width / 2) / window.innerWidth;
+                const y = (rect.top + rect.height / 2) / window.innerHeight;
+                
+                confetti({
+                    particleCount: 80,
+                    spread: 90,
+                    origin: { x: x, y: y },
+                    colors: ['#08ddbc', '#17ffdb', '#ffffff', '#10b981'],
+                    startVelocity: 55,
+                    gravity: 2,
+                    scalar: 0.7,
+                    drift: 0,
+                    ticks: 150,
+                    decay: 0.92
+                });
+                
+                setTimeout(() => {
+                    // Step 3: After 1 second, fade out form and start container transition
+                    const form = document.getElementById('contact-form');
+                    const container = document.getElementById('form-container');
+                    
+                    // Get current container height before animation
+                    const currentHeight = container.offsetHeight;
+                    container.style.height = currentHeight + 'px';
+                    
+                    form.classList.add('fade-out');
+                    
+                    setTimeout(() => {
+                        // Step 4: Hide form and show success message
+                        form.style.display = 'none';
+                        
+                        const successMessage = document.getElementById('success-message');
+                        const successTitle = document.getElementById('success-title');
+                        const successDescription = document.getElementById('success-description');
+                        
+                        successTitle.textContent = `¡Gracias ${firstName}!`;
+                        successDescription.textContent = `Te estaremos contactando a ${emailTrabajo} en menos de 24 horas laborales`;
+                        
+                        // Show success message (hidden first to measure height)
+                        successMessage.style.display = 'block';
+                        successMessage.style.opacity = '0';
+                        
+                        // Get success message height
+                        const successHeight = successMessage.offsetHeight;
+                        
+                        // Animate container to new height
+                        requestAnimationFrame(() => {
+                            container.style.height = (successHeight + 80) + 'px'; // Add padding
+                            
+                            // Fade in success message after a small delay
+                            setTimeout(() => {
+                                successMessage.style.opacity = '1';
+                                successMessage.classList.add('show');
+                            }, 100);
+                        });
+                    }, 500); // Wait for fade out to complete
+                }, 1000); // Keep checkmark for 1 second
+            }, 2000); // Spinner for 2 seconds
+        });
+    </script>
+</body>
+</html>
+
